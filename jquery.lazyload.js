@@ -1,4 +1,4 @@
-/*!
+/*
  * Lazy Load - jQuery plugin for lazy loading images
  *
  * Copyright (c) 2007-2015 Mika Tuupola
@@ -13,7 +13,20 @@
  *
  */
 
-(function($, window, document, undefined) {
+//factory-ized by mark b -- will fork if we ever move to bower
+ (function (factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['jquery'], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        // Node/CommonJS
+        module.exports = factory(require('jquery'));
+    } else {
+        // Browser globals
+        factory(jQuery);
+    }
+}(function ($) {
+
     var $window = $(window);
 
     $.fn.lazyload = function(options) {
@@ -27,6 +40,7 @@
             container       : window,
             data_attribute  : "original",
             skip_invisible  : false,
+            scroll_and_custom_event: false,
             appear          : null,
             load            : null,
             placeholder     : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC"
@@ -76,8 +90,8 @@
                       settings.container === window) ? $window : $(settings.container);
 
         /* Fire one scroll event per scroll. Not one scroll event per image. */
-        if (0 === settings.event.indexOf("scroll")) {
-            $container.bind(settings.event, function() {
+        if (0 === settings.event.indexOf("scroll") || settings.scroll_and_custom_event) {
+            $container.bind((settings.scroll_and_custom_event ? "scroll" : settings.event), function() {
                 return update();
             });
         }
@@ -238,5 +252,4 @@
         "right-of-fold"  : function(a) { return $.rightoffold(a, {threshold : 0}); },
         "left-of-fold"   : function(a) { return !$.rightoffold(a, {threshold : 0}); }
     });
-
-})(jQuery, window, document);
+}));
